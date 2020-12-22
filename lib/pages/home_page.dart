@@ -1,6 +1,7 @@
 import 'dart:convert';
 
-import 'package:api_consumer/api_users.dart';
+import 'package:api_consumer/widgets/user_card.dart';
+import 'package:api_consumer/models/api_users.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
@@ -11,6 +12,7 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   List<ApiUsers> _api;
+  bool carregado = false;
 
   Future<List<ApiUsers>> _getUser() async {
     try {
@@ -35,8 +37,11 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     super.initState();
     _getUser().then((map) {
-      _api = map;
-      print(_api.length);
+      setState(() {
+        _api = map;
+        carregado = true;
+      });
+      // print(_api.length);
     });
   }
 
@@ -47,19 +52,11 @@ class _HomeScreenState extends State<HomeScreen> {
         centerTitle: true,
         title: Text("HomeScreen"),
       ),
-      body: SafeArea(
-        child: ListView.builder(
-          itemCount: _api.length,
-          itemBuilder: (context, index) {
-            return Container(
-              margin: EdgeInsets.all(10),
-              height: 80,
-              color: Colors.blue,
-              child: Text(_api[index].phone),
-            );
-          },
-        ),
-      ),
+      body: carregado
+          ? UserCard(_api)
+          : Center(
+              child: CircularProgressIndicator(),
+            ),
     );
   }
 }
